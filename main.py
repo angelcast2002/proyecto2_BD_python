@@ -1,15 +1,11 @@
 from tkinter import *
-from signUp import SignupWindow
+from tkinter import messagebox
+from signup import SignupWindow
 from expediente import ExpedienteWindow
 import connection as con
 
-
 def main():
-    results = con.connect(r"""select * from prueba;""")
-    print(results)
     principalWindow()
-   
-   
 
 def principalWindow():
     win = Tk()
@@ -19,9 +15,9 @@ def principalWindow():
     inputUsername = Entry(win)
     
     etiPassword = Label(win, text="Password")
-    inputPassword = Entry(win)
+    inputPassword = Entry(win, show="*")
     
-    buttonLogin = Button(win, text="Login", command= lambda: login(inputPassword, inputUsername, win))
+    buttonLogin = Button(win, text="Login", command= lambda: login(inputUsername, inputPassword, win))
     buttonSignup = Button(win, text="Signup", command= lambda: signUp(win))
     
     etiUsername.pack()
@@ -36,12 +32,21 @@ def principalWindow():
     
 def signUp(win):
     SignupWindow(win)
+
+# Login function
+def login(inputUsername, inputPassword, win):
+    username = inputUsername.get()
+    password = inputPassword.get()
+    query = f"SELECT COUNT(*) FROM usuarios WHERE username='{username}' AND password='{password}'" # Query
+    results = con.connect(query)
     
-def login(inputPassword, inputUsername, win):
-    if (inputPassword.get() == "123" and inputUsername.get() == "123"):
+    # None type data verification
+    if results is not None and results[0][0] == 1:
         ExpedienteWindow(win)
+        
+    # Error message if credentials do not match
+    else:
+        messagebox.showerror("Error de inicio de sesión", "Usuario o contraseña incorrectos")
 
-
-    
 if __name__ == '__main__':
     main()
